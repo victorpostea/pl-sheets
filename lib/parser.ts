@@ -7,7 +7,7 @@ export function parseSheet(rows: string[][]): DayBlock[] {
 
   for (let i = 2; i < rows.length; i++) {
     const row = rows[i]
-    const sheetRow = i + 1  // rows array is 0-based; sheet rows are 1-based
+    const sheetRow = i + 1  // 1-based sheet row (assumes CSV exported starting from row 1)
 
     // Empty row — end the current day block
     if (!row || row.every(cell => !cell)) {
@@ -47,13 +47,13 @@ export function parseSheet(rows: string[][]): DayBlock[] {
 
     const exercise: Exercise = {
       name: cellA,
-      sets: row[1] ?? '',
-      reps: row[3] ?? '',
-      prescribedRpe: row[4] ?? '',
+      sets: row[1] ?? '',        // col B
+      weightUsed: row[2] ?? '',  // col C — user fills this in
+      reps: row[3] ?? '',        // col D
+      prescribedRpe: row[4] ?? '', // col E (RPE or RIR)
       weightCell: `C${sheetRow}`,
       actualRpeCell: `F${sheetRow}`,
-      weightUsed: row[2] ?? '',
-      actualRpe: row[5] ?? '',
+      actualRpe: row[5] ?? '',   // col F — user fills this in
       isAccessory,
     }
 

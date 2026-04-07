@@ -80,4 +80,21 @@ describe('parseSheet', () => {
     expect(result[0].mainLifts[0].weightUsed).toBe('140')
     expect(result[0].mainLifts[0].actualRpe).toBe('7')
   })
+
+  it('resets isAccessory to false at the start of a new day block', () => {
+    const result = parseSheet(WEEK1_ROWS)
+    // Day 2 main lifts must NOT be marked as accessories,
+    // even though Day 1 ended with an accessories section
+    result[1].mainLifts.forEach(lift => {
+      expect(lift.isAccessory).toBe(false)
+    })
+  })
+
+  it('handles a sheet with no trailing empty row after the last day', () => {
+    // Remove the trailing empty row from Day 2 (last row in fixture)
+    const rowsNoTrailingEmpty = WEEK1_ROWS.slice(0, -1)
+    const result = parseSheet(rowsNoTrailingEmpty)
+    expect(result).toHaveLength(2)
+    expect(result[1].title).toBe('Primary Deadlift + Tertiary Bench')
+  })
 })
