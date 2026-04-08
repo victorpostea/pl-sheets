@@ -27,7 +27,7 @@ export function ExerciseCard({ exercise, onSave }: Props) {
       <div className={`grid gap-3 ${exercise.isAccessory ? 'grid-cols-1' : 'grid-cols-2'}`}>
         <div>
           <label className="block text-xs uppercase tracking-wide text-gray-400 mb-1">
-            Weight (kg)
+            Weight (lbs)
           </label>
           <InlineField
             initialValue={exercise.weightUsed}
