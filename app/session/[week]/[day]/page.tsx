@@ -7,13 +7,24 @@ import { ExerciseCard } from '@/components/ExerciseCard'
 export default function SessionPage() {
   const params = useParams()
   const router = useRouter()
-  const weekName = decodeURIComponent(params.week as string)
+
+  let weekName = ''
+  try {
+    weekName = decodeURIComponent(params.week as string)
+  } catch {
+    // malformed percent-sequence in URL — treat as invalid
+  }
   const dayNum = parseInt(params.day as string, 10)
 
   const [dayBlock, setDayBlock] = useState<DayBlock | null>(null)
-  const [error, setError] = useState('')
+  const [error, setError] = useState(() => {
+    if (!weekName) return 'Invalid week parameter'
+    if (isNaN(dayNum)) return 'Invalid day parameter'
+    return ''
+  })
 
   useEffect(() => {
+    if (error) return  // don't fetch if params are invalid
     fetch(`/api/session?week=${encodeURIComponent(weekName)}&day=${dayNum}`)
       .then(r => r.json())
       .then(data => {
@@ -21,7 +32,7 @@ export default function SessionPage() {
         else setDayBlock(data)
       })
       .catch(() => setError('Failed to load session'))
-  }, [weekName, dayNum])
+  }, [weekName, dayNum, error])
 
   async function handleSave(cell: string, value: string) {
     const res = await fetch('/api/session', {
@@ -56,11 +67,10 @@ export default function SessionPage() {
 
   return (
     <div className="min-h-dvh flex flex-col">
-      {/* Red gradient header */}
       <header className="bg-gradient-to-r from-accent to-accent-dark px-4 py-4 flex items-center gap-4">
         <button
           onClick={() => router.push('/select')}
-          className="text-white font-black text-2xl px-1 active:opacity-70"
+          className="text-white font-black text-2xl p-3 active:opacity-70"
           aria-label="Back"
         >
           ←
@@ -76,7 +86,6 @@ export default function SessionPage() {
       </header>
 
       <main className="flex-1 px-4 py-6 flex flex-col gap-8 pb-12">
-        {/* Main lifts */}
         {dayBlock.mainLifts.length > 0 && (
           <section>
             <h2 className="text-xs font-bold tracking-widest uppercase text-gray-400 mb-3">
@@ -84,17 +93,12 @@ export default function SessionPage() {
             </h2>
             <div className="flex flex-col gap-3">
               {dayBlock.mainLifts.map((exercise, i) => (
-                <ExerciseCard
-                  key={i}
-                  exercise={exercise}
-                  onSave={handleSave}
-                />
+                <ExerciseCard key={exercise.weightCell} exercise={exercise} onSave={handleSave} />
               ))}
             </div>
           </section>
         )}
 
-        {/* Accessories */}
         {dayBlock.accessories.length > 0 && (
           <section>
             <h2 className="text-xs font-bold tracking-widest uppercase text-gray-400 mb-3">
@@ -102,11 +106,7 @@ export default function SessionPage() {
             </h2>
             <div className="flex flex-col gap-3">
               {dayBlock.accessories.map((exercise, i) => (
-                <ExerciseCard
-                  key={i}
-                  exercise={exercise}
-                  onSave={handleSave}
-                />
+                <ExerciseCard key={exercise.weightCell} exercise={exercise} onSave={handleSave} />
               ))}
             </div>
           </section>

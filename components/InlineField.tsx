@@ -12,8 +12,8 @@ export function InlineField({ initialValue, placeholder, onSave, inputMode = 'de
   const [value, setValue] = useState(initialValue)
   const [status, setStatus] = useState<'idle' | 'saved' | 'error'>('idle')
   const inputRef = useRef<HTMLInputElement>(null)
-
   const savingRef = useRef(false)
+  const enterSavedRef = useRef(false)  // prevents blur from double-saving after Enter
 
   async function trySave(currentValue: string) {
     if (currentValue === initialValue) return
@@ -45,9 +45,16 @@ export function InlineField({ initialValue, placeholder, onSave, inputMode = 'de
       placeholder={placeholder}
       inputMode={inputMode}
       onChange={e => setValue(e.target.value)}
-      onBlur={e => trySave(e.target.value)}
+      onBlur={e => {
+        if (enterSavedRef.current) {
+          enterSavedRef.current = false
+          return
+        }
+        trySave(e.target.value)
+      }}
       onKeyDown={e => {
         if (e.key === 'Enter') {
+          enterSavedRef.current = true
           trySave(value)
           inputRef.current?.blur()
         }
