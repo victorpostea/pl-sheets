@@ -1,0 +1,55 @@
+'use client'
+import { Exercise } from '@/lib/types'
+import { InlineField } from './InlineField'
+
+interface Props {
+  exercise: Exercise
+  onSave: (cell: string, value: string) => Promise<void>
+}
+
+export function ExerciseCard({ exercise, onSave }: Props) {
+  return (
+    <div className="bg-navy-card rounded-lg p-4 border-l-4 border-accent">
+      {/* Exercise name + prescribed sets/reps/RPE */}
+      <div className="flex items-start justify-between gap-2 mb-3">
+        <h3 className="font-bold text-white text-sm leading-tight">{exercise.name}</h3>
+        <div className="flex gap-2 shrink-0">
+          <span className="text-xs bg-navy-deep px-2 py-1 rounded font-bold text-gray-300">
+            {exercise.sets}×{exercise.reps}
+          </span>
+          <span className="text-xs bg-navy-deep px-2 py-1 rounded font-bold text-accent">
+            {exercise.isAccessory ? 'RIR' : 'RPE'} {exercise.prescribedRpe}
+          </span>
+        </div>
+      </div>
+
+      {/* Editable fields */}
+      <div className={`grid gap-3 ${exercise.isAccessory ? 'grid-cols-1' : 'grid-cols-2'}`}>
+        <div>
+          <label className="block text-xs uppercase tracking-wide text-gray-400 mb-1">
+            Weight (kg)
+          </label>
+          <InlineField
+            initialValue={exercise.weightUsed}
+            placeholder="—"
+            onSave={v => onSave(exercise.weightCell, v)}
+            inputMode="decimal"
+          />
+        </div>
+        {!exercise.isAccessory && (
+          <div>
+            <label className="block text-xs uppercase tracking-wide text-gray-400 mb-1">
+              Actual RPE
+            </label>
+            <InlineField
+              initialValue={exercise.actualRpe}
+              placeholder="—"
+              onSave={v => onSave(exercise.actualRpeCell, v)}
+              inputMode="decimal"
+            />
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
