@@ -45,20 +45,20 @@ export function PinPad({ onSubmit, error }: Props) {
 
       {/* Numpad grid */}
       <div className="grid grid-cols-3 gap-4">
-        {KEYS.map((key, i) => (
-          <button
-            key={i}
-            onClick={() => key && press(key)}
-            disabled={!key}
-            className={`w-20 h-20 rounded-full text-2xl font-bold transition-colors ${
-              key
-                ? 'bg-navy-card text-white active:bg-accent'
-                : 'invisible'
-            }`}
-          >
-            {key}
-          </button>
-        ))}
+        {KEYS.map((key, i) =>
+          key ? (
+            <button
+              key={key === '⌫' ? 'del' : key}
+              onClick={() => press(key)}
+              aria-label={key === '⌫' ? 'Delete' : undefined}
+              className="w-20 h-20 rounded-full text-2xl font-bold transition-colors bg-navy-card text-white active:bg-accent"
+            >
+              {key}
+            </button>
+          ) : (
+            <div key="empty" />
+          )
+        )}
       </div>
     </div>
   )

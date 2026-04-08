@@ -19,16 +19,17 @@ describe('PinPad', () => {
     expect(screen.getByText('Wrong PIN')).toBeInTheDocument()
   })
 
-  it('delete button removes last digit so submit is not called after 4 taps', () => {
+  it('delete corrects the PIN before submission', () => {
     const onSubmit = jest.fn()
     render(<PinPad onSubmit={onSubmit} />)
     fireEvent.click(screen.getByText('1'))
     fireEvent.click(screen.getByText('7'))
-    fireEvent.click(screen.getByText('⌫'))  // removes '7', pin is now '1'
+    fireEvent.click(screen.getByLabelText('Delete'))  // removes '7', pin is '1'
+    fireEvent.click(screen.getByText('7'))  // re-enter correct digit
     fireEvent.click(screen.getByText('3'))
     fireEvent.click(screen.getByText('8'))
-    // PIN is '138' — only 3 digits entered after delete, no submit yet
-    expect(onSubmit).not.toHaveBeenCalled()
+    // PIN should be '1738', not '1738' with a stray '7' or wrong digit
+    expect(onSubmit).toHaveBeenCalledWith('1738')
   })
 
   it('resets to empty after submission', () => {
