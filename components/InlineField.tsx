@@ -1,0 +1,57 @@
+'use client'
+import { useState, useRef } from 'react'
+
+interface Props {
+  initialValue: string
+  placeholder: string
+  onSave: (value: string) => Promise<void>
+  inputMode?: 'numeric' | 'decimal'
+}
+
+export function InlineField({ initialValue, placeholder, onSave, inputMode = 'decimal' }: Props) {
+  const [value, setValue] = useState(initialValue)
+  const [status, setStatus] = useState<'idle' | 'saved' | 'error'>('idle')
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  const savingRef = useRef(false)
+
+  async function trySave(currentValue: string) {
+    if (currentValue === initialValue) return
+    if (savingRef.current) return
+    savingRef.current = true
+    try {
+      await onSave(currentValue)
+      setStatus('saved')
+      setTimeout(() => setStatus('idle'), 1500)
+    } catch {
+      setStatus('error')
+      setTimeout(() => setStatus('idle'), 2000)
+    } finally {
+      savingRef.current = false
+    }
+  }
+
+  return (
+    <input
+      ref={inputRef}
+      className={`w-full bg-navy-deep rounded px-3 py-2 text-center font-bold text-lg border transition-colors ${
+        status === 'saved'
+          ? 'border-green-400 text-green-400'
+          : status === 'error'
+          ? 'border-red-500 text-red-400'
+          : 'border-navy-card text-white focus:border-accent'
+      }`}
+      value={value}
+      placeholder={placeholder}
+      inputMode={inputMode}
+      onChange={e => setValue(e.target.value)}
+      onBlur={e => trySave(e.target.value)}
+      onKeyDown={e => {
+        if (e.key === 'Enter') {
+          trySave(value)
+          inputRef.current?.blur()
+        }
+      }}
+    />
+  )
+}
