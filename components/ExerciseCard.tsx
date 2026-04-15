@@ -23,6 +23,13 @@ export function ExerciseCard({ exercise, onSave }: Props) {
         </div>
       </div>
 
+      {/* Last week's weight — shown above the input as a small hint */}
+      {exercise.lastWeekWeight && (
+        <p className="text-xs text-gray-500 mb-1 text-center">
+          Last week: <span className="text-gray-400 font-semibold">{exercise.lastWeekWeight} lbs</span>
+        </p>
+      )}
+
       {/* Editable fields */}
       <div className={`grid gap-3 ${exercise.isAccessory ? 'grid-cols-1' : 'grid-cols-2'}`}>
         <div>
@@ -34,8 +41,6 @@ export function ExerciseCard({ exercise, onSave }: Props) {
             placeholder="—"
             onSave={v => onSave(exercise.weightCell, v)}
             inputMode="decimal"
-            size="sm"
-            className="text-sm"
           />
         </div>
         {!exercise.isAccessory && (
@@ -48,36 +53,29 @@ export function ExerciseCard({ exercise, onSave }: Props) {
               placeholder="—"
               onSave={v => onSave(exercise.actualRpeCell, v)}
               inputMode="decimal"
-              size="sm"
-              className="text-sm"
             />
           </div>
         )}
       </div>
 
-      {/* Last week's weight display */}
-      {exercise.lastWeekWeight && (
-        <div className="mb-3 p-2 bg-green-500/10 rounded-lg border border-green-500/30">
-          <p className="text-xs text-green-400 font-bold uppercase tracking-wide text-center">
-            Last Week: <span className="text-white font-mono text-sm">{exercise.lastWeekWeight}</span> lbs
-            {exercise.lastWeekRpe ? ` • RPE ${exercise.lastWeekRpe}` : ''}
-          </p>
+      {/* Notes field — collapsible, writes to col G */}
+      <details className="mt-3 border-t border-gray-700 pt-3">
+        <summary className="list-none cursor-pointer text-xs font-bold text-gray-400 uppercase tracking-wide hover:text-accent">
+          📝 Notes {exercise.notes ? '·' : ''}
+          {exercise.notes && (
+            <span className="normal-case font-normal text-gray-500 ml-1 truncate">{exercise.notes}</span>
+          )}
+        </summary>
+        <div className="mt-2">
+          <InlineField
+            initialValue={exercise.notes}
+            placeholder="Add notes..."
+            onSave={v => onSave(exercise.notesCell, v)}
+            inputMode="numeric"
+            isTextarea
+          />
         </div>
-      )}
-
-      {/* Collapsible notes section - spans full width */}
-      <div className="mt-3 border-t border-gray-700 pt-3 pl-7">
-        <details>
-          <summary className="list-none cursor-pointer cursor-pointer text-xs font-bold text-gray-400 uppercase tracking-wide hover:text-accent">
-            📝 Sheet Notes
-          </summary>
-          <div className="mt-2 p-3 bg-navy-deep ml-4 rounded-lg">
-            <p className="text-gray-300 text-sm">
-              Enter your handwritten notes from your sheet here.
-            </p>
-          </div>
-        </details>
-      </div>
+      </details>
     </div>
   )
 }

@@ -6,16 +6,16 @@ interface Props {
   placeholder: string
   onSave: (value: string) => Promise<void>
   inputMode?: 'numeric' | 'decimal'
-  size?: 'sm' | 'md' | 'lg'
-  className?: string
+  isTextarea?: boolean
 }
 
-export function InlineField({ initialValue, placeholder, onSave, inputMode = 'decimal', size = 'md', className = '' }: Props) {
+export function InlineField({ initialValue, placeholder, onSave, inputMode = 'decimal', isTextarea = false }: Props) {
   const [value, setValue] = useState(initialValue)
   const [status, setStatus] = useState<'idle' | 'saved' | 'error'>('idle')
   const inputRef = useRef<HTMLInputElement>(null)
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
   const savingRef = useRef(false)
-  const enterSavedRef = useRef(false)  // prevents blur from double-saving after Enter
+  const enterSavedRef = useRef(false)
 
   async function trySave(currentValue: string) {
     if (currentValue === initialValue) return
@@ -33,20 +33,31 @@ export function InlineField({ initialValue, placeholder, onSave, inputMode = 'de
     }
   }
 
+  const baseClass = `w-full bg-navy-deep rounded px-3 py-2 font-bold border transition-colors ${
+    status === 'saved'
+      ? 'border-green-400 text-green-400'
+      : status === 'error'
+      ? 'border-red-500 text-red-400'
+      : 'border-navy-card text-white focus:border-accent'
+  }`
+
+  if (isTextarea) {
+    return (
+      <textarea
+        ref={textareaRef}
+        className={`${baseClass} text-sm resize-none min-h-[72px]`}
+        value={value}
+        placeholder={placeholder}
+        onChange={e => setValue(e.target.value)}
+        onBlur={e => trySave(e.target.value)}
+      />
+    )
+  }
+
   return (
     <input
       ref={inputRef}
-      className={`w-full bg-navy-deep rounded px-3 py-2 text-center font-bold border transition-colors ${
-        status === 'saved'
-          ? 'border-green-400 text-green-400'
-          : status === 'error'
-          ? 'border-red-500 text-red-400'
-          : 'border-navy-card text-white focus:border-accent'
-      } ${className || ''}`}
-      style={{
-        fontSize: size === 'sm' ? '0.875rem' : size === 'lg' ? '1.25rem' : '1rem',
-        paddingBlock: size === 'sm' ? '0.5rem' : size === 'lg' ? '0.75rem' : '0.625rem',
-      }}
+      className={`${baseClass} text-center text-lg`}
       value={value}
       placeholder={placeholder}
       inputMode={inputMode}

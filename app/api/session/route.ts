@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSession } from '@/lib/auth'
-import { getSheetData, writeCell } from '@/lib/sheets'
+import { getSheetData, getSheetTabs, writeCell } from '@/lib/sheets'
 import { parseSheet } from '@/lib/parser'
 
 export async function GET(req: NextRequest) {
@@ -21,80 +21,43 @@ export async function GET(req: NextRequest) {
   const days = parseSheet(rows)
   const dayBlock = days.find(d => d.dayNumber === day)
 
-  // Fetch last week's data to show previous weights
-  let lastWeekData: any = null
-  try {
-    const weekParts = week.replace('Week ', '').replace('Sheet', '').trim()
-    let weekNum = parseInt(weekParts, 10)
-    
-    if (isNaN(weekNum)) {
-      // Fallback for Week 2 or 1Week Sheet
-      if (week === 'Week 2' || week === '1Week Sheet') {
-        lastWeekData = { name: 'Prep Sheet' }
-      }
-    } else {
-      const lastWeekName = `${weekNum - 1}Week Sheet`
-      const lastWeekRows = await getSheetData(session.sheetId!, lastWeekName)
-      const lastWeekDays = parseSheet(lastWeekRows)
-      const lastWeekDayBlock = lastWeekDays.find(d => d.dayNumber === day)
-      if (lastWeekDayBlock) {
-        lastWeekData = lastWeekDayBlock
-      }
-    }
-  } catch (e) {
-    // Last week doesn't exist yet
-  }
-
   if (!dayBlock) {
     return NextResponse.json({ error: 'Day not found' }, { status: 404 })
   }
 
-  // Merge last week's weights into current exercises
-  if (dayBlock && lastWeekData) {
-    const mergedExercises: any[] = []
-    const seenNames = new Set<string>()
+  // Try to fetch last week's data to show previous weights
+  try {
+    const allTabs = await getSheetTabs(session.sheetId!)
+    const currentIndex = allTabs.indexOf(week)
+    if (currentIndex > 0) {
+      const lastWeekTab = allTabs[currentIndex - 1]
+      const lastWeekRows = await getSheetData(session.sheetId!, lastWeekTab)
+      const lastWeekDays = parseSheet(lastWeekRows)
+      const lastWeekDayBlock = lastWeekDays.find(d => d.dayNumber === day)
 
-    // Process current exercises
-    for (const exercise of dayBlock.mainLifts) {
-      // Check if data already exists for this name
-      if (seenNames.has(exercise.name)) continue
-      seenNames.add(exercise.name)
+      if (lastWeekDayBlock) {
+        // Build a lookup map by exercise name → last week's weight
+        const lastWeekMap = new Map<string, string>()
+        for (const ex of [...lastWeekDayBlock.mainLifts, ...lastWeekDayBlock.accessories]) {
+          if (ex.weightUsed) lastWeekMap.set(ex.name.trim(), ex.weightUsed)
+        }
 
-      // Find matching exercise from last week
-      const lastWeekExercise = lastWeekData.mainLifts.find(
-        (e: any) => e.name.trim() === exercise.name.trim()
-      )
-      if (lastWeekExercise) {
-        mergedExercises.push({
-          ...exercise,
-          lastWeekWeight: lastWeekExercise.weightUsed,
-          lastWeekRpe: lastWeekExercise.actualRpe,
+        // Merge last week weight into current exercises
+        const mergeWeight = (exercises: typeof dayBlock.mainLifts) =>
+          exercises.map(ex => ({
+            ...ex,
+            lastWeekWeight: lastWeekMap.get(ex.name.trim()) ?? '',
+          }))
+
+        return NextResponse.json({
+          ...dayBlock,
+          mainLifts: mergeWeight(dayBlock.mainLifts),
+          accessories: mergeWeight(dayBlock.accessories),
         })
-      } else {
-        mergedExercises.push(exercise)
       }
     }
-
-    // Process accessories
-    for (const exercise of dayBlock.accessories) {
-      if (seenNames.has(exercise.name)) continue
-      seenNames.add(exercise.name)
-      mergedExercises.push(exercise)
-    }
-
-    // Sort by exercise name for consistent display order
-    const sortedMerged = mergedExercises.sort((a, b) => {
-      const priority = a.isAccessory ? 1 : 0
-      const priority2 = b.isAccessory ? 1 : 0
-      if (priority !== priority2) return priority - priority2
-      return a.name.localeCompare(b.name)
-    })
-
-    return NextResponse.json({
-      ...dayBlock,
-      mainLifts: sortedMerged.filter((e: any) => e.isAccessory === false),
-      accessories: sortedMerged.filter((e: any) => e.isAccessory === true),
-    })
+  } catch {
+    // Last week data unavailable — just return current data
   }
 
   return NextResponse.json(dayBlock)

@@ -47,13 +47,15 @@ export function parseSheet(rows: string[][]): DayBlock[] {
 
     const exercise: Exercise = {
       name: cellA,
-      sets: row[1] ?? '',        // col B
-      weightUsed: row[2] ?? '',  // col C — user fills this in
-      reps: row[3] ?? '',        // col D
+      sets: row[1] ?? '',          // col B
+      weightUsed: row[2] ?? '',    // col C — user fills this in
+      reps: row[3] ?? '',          // col D
       prescribedRpe: row[4] ?? '', // col E (RPE or RIR)
+      actualRpe: row[5] ?? '',     // col F — user fills this in
+      notes: row[6] ?? '',         // col G — user fills this in
       weightCell: `C${sheetRow}`,
       actualRpeCell: `F${sheetRow}`,
-      actualRpe: row[5] ?? '',   // col F — user fills this in
+      notesCell: `G${sheetRow}`,
       isAccessory,
     }
 
