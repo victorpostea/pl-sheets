@@ -23,11 +23,13 @@ export function ExerciseCard({ exercise, onSave }: Props) {
         </div>
       </div>
 
-      {/* Last week's weight — shown above the input as a small hint */}
+      {/* Last week's weight — shown as a subtle badge flush to the top right */}
       {exercise.lastWeekWeight && (
-        <p className="text-xs text-gray-500 mb-1 text-center">
-          Last week: <span className="text-gray-400 font-semibold">{exercise.lastWeekWeight} lbs</span>
-        </p>
+        <div className="flex justify-end mb-2">
+          <span className="text-xs bg-navy-deep text-gray-500 px-2 py-0.5 rounded font-bold tracking-wide">
+            ↑ {exercise.lastWeekWeight} lbs last wk
+          </span>
+        </div>
       )}
 
       {/* Editable fields */}
