@@ -6,6 +6,8 @@ interface Props {
   placeholder: string
   onSave: (value: string) => Promise<void>
   inputMode?: 'numeric' | 'decimal'
+  size?: 'sm' | 'md' | 'lg'
+  className?: string
 }
 
 export function InlineField({ initialValue, placeholder, onSave, inputMode = 'decimal' }: Props) {
@@ -34,13 +36,17 @@ export function InlineField({ initialValue, placeholder, onSave, inputMode = 'de
   return (
     <input
       ref={inputRef}
-      className={`w-full bg-navy-deep rounded px-3 py-2 text-center font-bold text-lg border transition-colors ${
+      className={`w-full bg-navy-deep rounded px-3 py-2 text-center font-bold border transition-colors ${
         status === 'saved'
           ? 'border-green-400 text-green-400'
           : status === 'error'
           ? 'border-red-500 text-red-400'
           : 'border-navy-card text-white focus:border-accent'
-      }`}
+      } ${className || ''}`}
+      style={{
+        fontSize: size === 'sm' ? '0.875rem' : size === 'lg' ? '1.25rem' : '1rem',
+        paddingBlock: size === 'sm' ? '0.5rem' : size === 'lg' ? '0.75rem' : '0.625rem',
+      }}
       value={value}
       placeholder={placeholder}
       inputMode={inputMode}

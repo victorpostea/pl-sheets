@@ -34,6 +34,8 @@ export function ExerciseCard({ exercise, onSave }: Props) {
             placeholder="—"
             onSave={v => onSave(exercise.weightCell, v)}
             inputMode="decimal"
+            size="sm"
+            className="text-sm"
           />
         </div>
         {!exercise.isAccessory && (
@@ -46,9 +48,23 @@ export function ExerciseCard({ exercise, onSave }: Props) {
               placeholder="—"
               onSave={v => onSave(exercise.actualRpeCell, v)}
               inputMode="decimal"
+              size="sm"
+              className="text-sm"
             />
           </div>
         )}
+
+      {/* Collapsible notes section */}
+      <details className="mt-3 border-t border-gray-700 pt-3">
+        <summary className="list-none cursor-pointer text-xs font-bold text-gray-400 uppercase tracking-wide hover:text-accent">
+          📝 Sheet Notes
+        </summary>
+        <div className="mt-2 p-3 bg-navy-deep rounded-lg">
+          <p className="text-gray-300 text-sm">
+            Enter your handwritten notes from your sheet here.
+          </p>
+        </div>
+      </details>
       </div>
     </div>
   )
