@@ -54,6 +54,16 @@ export function ExerciseCard({ exercise, onSave }: Props) {
           </div>
         )}
 
+      {/* Last week's weight display */}
+      {exercise.lastWeekWeight && (
+        <div className="mb-3 p-2 bg-green-500/10 rounded-lg border border-green-500/30">
+          <p className="text-xs text-green-400 font-bold uppercase tracking-wide text-center">
+            Last Week: <span className="text-white font-mono text-sm">{exercise.lastWeekWeight}</span> lbs
+            {exercise.lastWeekRpe ? ` • RPE ${exercise.lastWeekRpe}` : ''}
+          </p>
+        </div>
+      )}
+
       {/* Collapsible notes section */}
       <details className="mt-3 border-t border-gray-700 pt-3">
         <summary className="list-none cursor-pointer text-xs font-bold text-gray-400 uppercase tracking-wide hover:text-accent">

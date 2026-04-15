@@ -18,6 +18,8 @@ export interface Exercise {
   weightUsed: string     // current value already in the sheet (may be empty string)
   actualRpe: string      // current value already in the sheet (may be empty string)
   isAccessory: boolean
+  lastWeekWeight?: string // Previous week's weight for reference
+  lastWeekRpe?: string    // Previous week's RPE/RIR for reference
 }
 
 export interface DayBlock {
