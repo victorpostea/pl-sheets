@@ -53,6 +53,7 @@ export function ExerciseCard({ exercise, onSave }: Props) {
             />
           </div>
         )}
+      </div>
 
       {/* Last week's weight display */}
       {exercise.lastWeekWeight && (
