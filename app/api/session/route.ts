@@ -22,13 +22,18 @@ export async function GET(req: NextRequest) {
   const dayBlock = days.find(d => d.dayNumber === day)
 
   // Fetch last week's data to show previous weights
-  const lastWeekName = `${week.replace('Week ', '') - 1}Week ` +
-    'Sheet'
   let lastWeekData: any = null
   try {
-    if (week === 'Week 2' || week === '1Week Sheet') {
-      lastWeekData = { name: 'Prep Sheet' }
+    const weekParts = week.replace('Week ', '').replace('Sheet', '').trim()
+    let weekNum = parseInt(weekParts, 10)
+    
+    if (isNaN(weekNum)) {
+      // Fallback for Week 2 or 1Week Sheet
+      if (week === 'Week 2' || week === '1Week Sheet') {
+        lastWeekData = { name: 'Prep Sheet' }
+      }
     } else {
+      const lastWeekName = `${weekNum - 1}Week Sheet`
       const lastWeekRows = await getSheetData(session.sheetId!, lastWeekName)
       const lastWeekDays = parseSheet(lastWeekRows)
       const lastWeekDayBlock = lastWeekDays.find(d => d.dayNumber === day)

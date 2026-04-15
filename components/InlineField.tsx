@@ -10,7 +10,7 @@ interface Props {
   className?: string
 }
 
-export function InlineField({ initialValue, placeholder, onSave, inputMode = 'decimal' }: Props) {
+export function InlineField({ initialValue, placeholder, onSave, inputMode = 'decimal', size = 'md', className = '' }: Props) {
   const [value, setValue] = useState(initialValue)
   const [status, setStatus] = useState<'idle' | 'saved' | 'error'>('idle')
   const inputRef = useRef<HTMLInputElement>(null)
