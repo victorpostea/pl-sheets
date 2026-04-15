@@ -64,17 +64,18 @@ export function ExerciseCard({ exercise, onSave }: Props) {
         </div>
       )}
 
-      {/* Collapsible notes section */}
-      <details className="mt-3 border-t border-gray-700 pt-3">
-        <summary className="list-none cursor-pointer text-xs font-bold text-gray-400 uppercase tracking-wide hover:text-accent">
-          📝 Sheet Notes
-        </summary>
-        <div className="mt-2 p-3 bg-navy-deep rounded-lg">
-          <p className="text-gray-300 text-sm">
-            Enter your handwritten notes from your sheet here.
-          </p>
-        </div>
-      </details>
+      {/* Collapsible notes section - spans full width */}
+      <div className="mt-3 border-t border-gray-700 pt-3 pl-7">
+        <details>
+          <summary className="list-none cursor-pointer cursor-pointer text-xs font-bold text-gray-400 uppercase tracking-wide hover:text-accent">
+            📝 Sheet Notes
+          </summary>
+          <div className="mt-2 p-3 bg-navy-deep ml-4 rounded-lg">
+            <p className="text-gray-300 text-sm">
+              Enter your handwritten notes from your sheet here.
+            </p>
+          </div>
+        </details>
       </div>
     </div>
   )
