@@ -36,17 +36,18 @@ export async function GET(req: NextRequest) {
       const lastWeekDayBlock = lastWeekDays.find(d => d.dayNumber === day)
 
       if (lastWeekDayBlock) {
-        // Build a lookup map by exercise name → last week's weight
-        const lastWeekMap = new Map<string, string>()
+        // Build a lookup map by exercise name → last week's weight + RPE
+        const lastWeekMap = new Map<string, { weight: string; rpe: string }>()
         for (const ex of [...lastWeekDayBlock.mainLifts, ...lastWeekDayBlock.accessories]) {
-          if (ex.weightUsed) lastWeekMap.set(ex.name.trim(), ex.weightUsed)
+          lastWeekMap.set(ex.name.trim(), { weight: ex.weightUsed, rpe: ex.actualRpe })
         }
 
-        // Merge last week weight into current exercises
+        // Merge last week weight + RPE into current exercises
         const mergeWeight = (exercises: typeof dayBlock.mainLifts) =>
           exercises.map(ex => ({
             ...ex,
-            lastWeekWeight: lastWeekMap.get(ex.name.trim()) ?? '',
+            lastWeekWeight: lastWeekMap.get(ex.name.trim())?.weight ?? '',
+            lastWeekRpe: lastWeekMap.get(ex.name.trim())?.rpe ?? '',
           }))
 
         return NextResponse.json({

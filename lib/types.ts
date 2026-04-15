@@ -21,6 +21,7 @@ export interface Exercise {
   notes: string          // col G — user fills this in
   isAccessory: boolean
   lastWeekWeight?: string // Previous week's weight for reference
+  lastWeekRpe?: string    // Previous week's actual RPE for reference
 }
 
 export interface DayBlock {

@@ -23,12 +23,19 @@ export function ExerciseCard({ exercise, onSave }: Props) {
         </div>
       </div>
 
-      {/* Last week's weight — shown as a subtle badge flush to the top right */}
-      {exercise.lastWeekWeight && (
-        <div className="flex justify-end mb-2">
-          <span className="text-xs bg-navy-deep text-gray-500 px-2 py-0.5 rounded font-bold tracking-wide">
-            ↑ {exercise.lastWeekWeight} lbs last wk
-          </span>
+      {/* Last week's weight + RPE — shown as subtle badges flush to the top right */}
+      {(exercise.lastWeekWeight || exercise.lastWeekRpe) && (
+        <div className="flex justify-end gap-2 mb-2">
+          {exercise.lastWeekWeight && (
+            <span className="text-xs bg-navy-deep text-gray-500 px-2 py-0.5 rounded font-bold tracking-wide">
+              ↑ {exercise.lastWeekWeight} lbs
+            </span>
+          )}
+          {exercise.lastWeekRpe && (
+            <span className="text-xs bg-navy-deep text-gray-500 px-2 py-0.5 rounded font-bold tracking-wide">
+              RPE {exercise.lastWeekRpe}
+            </span>
+          )}
         </div>
       )}
 
